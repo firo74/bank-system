@@ -1,12 +1,8 @@
 from decimal import Decimal
 from random import randint
 
-try:
-    from models.customer import Customer
-    from models.bank import Bank
-except ModuleNotFoundError:
-    from customer import Customer
-    from bank import Bank
+from .customer import Customer
+from .bank import Bank
 
 class Account:
     def __init__(self, bank: Bank, customer: Customer, currency: str = 'IRR'):

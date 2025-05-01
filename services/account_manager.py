@@ -2,12 +2,14 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from models import Account, Bank, Customer
+from .notification_sender import NotificationSenderInterface
 
 class AccountManager:
-    def __init__(self, bank: Bank):
+    def __init__(self, bank: Bank, notification_senders:list[NotificationSenderInterface] = None):
         self.accounts : dict[str, Account] = {}
         self.customers : dict[str, Customer] = {}
         self.bank = bank
+        self.notification_senders = notification_senders or []
 
     def create_account(self, info: 'InitialInfo') -> tuple[str, Decimal]:
         # filtered_customers = list(filter(lambda c: c.nid == info.nid, self.customers))
@@ -41,6 +43,7 @@ class AccountManager:
         account = self.accounts[account_number]
         account.deposit(amount)
 
+        self._send_notification(f'Your account Charged +{amount}, Balance: {account.balance}', account.customer)
         return account.balance
 
     def withdraw(self, account_number: str, amount: Decimal) -> Decimal:
@@ -53,6 +56,7 @@ class AccountManager:
                 f'Balance is low: {account.balance}, Valid withdraw amount: {account.withdraw_balance}',
                 )
         
+        self._send_notification(f'Your account Charged -{amount}, Balance: {account.balance}', account.customer)
         return account.balance
     
     def get_balance(self, account_number: str) -> Decimal:
@@ -64,6 +68,9 @@ class AccountManager:
         if account_number not in self.accounts:
             raise Exception('There is no account with this account number')
             
+    def _send_notification(self, message: str, customer: Customer):
+        for notifier in self.notification_senders:
+            notifier.send(message, customer.name)
 
 
 @dataclass

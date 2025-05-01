@@ -32,6 +32,10 @@ class Account:
         return self.__balance
     
     @property
+    def withdraw_balance(self):
+        return self.__balance - self.__bank.withdraw_threshold
+
+    @property
     def account_number(self):
         return self.__account_number
 
@@ -39,7 +43,8 @@ class Account:
         self.__balance += amount
 
     def withdraw(self, amount: Decimal) -> bool:
-        if amount > self.__balance:
+        """True if ok, False if amount is more than balance"""
+        if amount > self.withdraw_balance:
             return False
         
         self.__balance -= amount

@@ -1,7 +1,7 @@
 # DTO = Data Transfer Object
 
 class Customer:
-    def __init__(self, nid, name):
+    def __init__(self, nid: str, name: str):
         self.__nid = nid
         self.name = name
         self.__accounts = {} # Navigator
